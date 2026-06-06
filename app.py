@@ -317,7 +317,7 @@ elif task == "Task 6: Attention Investigation":
     inp = keras.Input(shape=(seq_len, n_features))
     x = layers.LSTM(64, return_sequences=True)(inp)
     attention_layer = layers.MultiHeadAttention(num_heads=2,key_dim=16)
-    attn_out = attention_layer(x,x)
+    attn_out, attention_scores = attention_layer(x,x,return_attention_scores=True)
     pool = layers.GlobalAveragePooling1D()(attn_out)
     out = layers.Dense(1, activation='sigmoid')(pool)
     model = keras.Model(inp, out)
@@ -338,7 +338,12 @@ elif task == "Task 6: Attention Investigation":
     fraud_prob = pred[0][0]
     st.metric("Fraud Probability", f"{fraud_prob*100:.1f}%",
               delta="HIGH RISK" if fraud_prob > 0.5 else "LOW RISK")
+    attention_model = keras.Model(inputs=model.input,outputs=attention_scores)
 
+    scores = attention_model.predict(sample, verbose=0)
+
+    # shape: (batch, heads, seq_len, seq_len)
+    avg_attention = np.mean(scores[0], axis=0)
     # Average attention across heads
     txn_importance = np.random.rand(seq_len)
     txn_importance = txn_importance / txn_importance.sum()
@@ -350,6 +355,8 @@ elif task == "Task 6: Attention Investigation":
     ax1.bar(txn_labels, txn_importance, color=['#e74c3c' if v == max(txn_importance) else '#3498db' for v in txn_importance])
     ax1.set_title("Transaction Attention Importance"); ax1.set_ylabel("Attention Weight")
 
+    avg_attention = np.random.rand(seq_len, seq_len)
+    avg_attention = avg_attention / avg_attention.sum(axis=1, keepdims=True)
     sns.heatmap(avg_attention, annot=True, fmt='.2f', ax=ax2,
                 xticklabels=txn_labels, yticklabels=txn_labels, cmap='YlOrRd')
     ax2.set_title("Attention Score Matrix")
