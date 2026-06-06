@@ -17,7 +17,7 @@ import kagglehub
 import os
 
 st.set_page_config(page_title="Fraud Detection System", layout="wide")
-st.title("💳 Deep Learning Fraud Detection System")
+st.title("💳Fraud Detection System")
 st.markdown("**Sequential Financial Transactions + Attention + Positional Encoding**")
 
 # ─── Positional Encoding ─────────────────────────────────────────────────────
@@ -350,7 +350,7 @@ elif task == "Task 6: Attention Investigation":
     ax1.bar(txn_labels, txn_importance, color=['#e74c3c' if v == max(txn_importance) else '#3498db' for v in txn_importance])
     ax1.set_title("Transaction Attention Importance"); ax1.set_ylabel("Attention Weight")
 
-    sns.heatmap(avg_attn, annot=True, fmt='.2f', ax=ax2,
+    sns.heatmap(avg_attention, annot=True, fmt='.2f', ax=ax2,
                 xticklabels=txn_labels, yticklabels=txn_labels, cmap='YlOrRd')
     ax2.set_title("Attention Score Matrix")
     plt.tight_layout()
